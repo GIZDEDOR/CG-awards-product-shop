@@ -42,10 +42,10 @@ export function ThreeStage() {
 
   return (
     <div className="stage" aria-hidden="true">
-      <Canvas camera={{ position: [0, 0, 5.65], fov: 48 }} shadows dpr={[1, 1.75]}>
-        <color attach="background" args={["#11100d"]} />
-        <ambientLight intensity={1.18} />
-        <directionalLight position={[4, 6, 5]} intensity={2.25} castShadow />
+      <Canvas camera={{ position: [0, 0, 5.85], fov: 46 }} shadows dpr={[1, 1.65]}>
+        <color attach="background" args={["#18150f"]} />
+        <ambientLight intensity={1.42} />
+        <directionalLight position={[4, 6, 5]} intensity={2.05} castShadow />
         <Suspense fallback={<Html center className="canvas-loader">LOADING PRODUCT</Html>}>
           <Environment files={`${ASSET_PATH}studio_small_09_1k_low.hdr`} />
           {products.map((product, index) => (

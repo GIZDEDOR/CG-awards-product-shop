@@ -1,5 +1,4 @@
 import React, { useMemo, useRef } from "react";
-import { Float } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { smooth } from "../../utils/math";
@@ -37,13 +36,16 @@ export function ProductModel({ url, index, sceneStateRef }) {
     return list;
   }, [clone]);
   const scanColor = useMemo(() => new THREE.Color("#d84a31"), []);
-  const baseColor = useMemo(() => new THREE.Color("#ebe6d8"), []);
+  const baseColor = useMemo(() => new THREE.Color("#f2ead6"), []);
+  const targetPosition = useMemo(() => new THREE.Vector3(), []);
+  const targetScale = useRef(0.001);
+  const targetRotation = useMemo(() => new THREE.Euler(), []);
   const start = useMemo(() => {
     const points = [
-      [0.05, -0.88, 1.02],
-      [-1.18, 0.28, 1.04],
-      [0.12, 0.72, 1.08],
-      [1.12, 0.2, 1.02],
+      [0.08, -0.76, 1.02],
+      [-1.3, 0.2, 1.04],
+      [0.18, 0.64, 1.08],
+      [1.28, 0.14, 1.02],
     ];
     return new THREE.Vector3(...points[index % points.length]);
   }, [index]);
@@ -58,7 +60,7 @@ export function ProductModel({ url, index, sceneStateRef }) {
     return poses[index] || [0, 0, 0];
   }, [index]);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, delta) => {
     if (!group.current) return;
 
     const { scans, final } = sceneStateRef.current;
@@ -76,29 +78,32 @@ export function ProductModel({ url, index, sceneStateRef }) {
     const scanSpin = smooth(0.28, 0.82, scanProgress);
     const settleInCard = smooth(0.62, 0.84, scanProgress);
     const exitScan = smooth(0.78, 0.98, scanProgress);
-    const activeTravel = smooth(0.12, 0.82, scanProgress);
     const hasScanned = scanProgress > 0.98 && finalProgress < 0.02;
     const liftOthers = smooth(0.02, 0.64, activeScanProgress);
     const fadeOthers = smooth(0.34, 0.82, activeScanProgress);
 
     const basketScaleBoost = [0.95, 1.08, 0.82, 0.92][index] || 1;
-    const startScale = isMobile ? 1.42 : 2.18;
-    const scanScale = isMobile ? 1.72 : 2.52;
+    const startScale = isMobile ? 1.18 : 1.94;
+    const scanScale = isMobile ? 1.46 : 2.24;
     const exitScale = isMobile ? 0.04 : 0.06;
     const basketScale = (isMobile ? 0.66 : 0.92) * basketScaleBoost;
-    const spreadX = isMobile ? 0.95 : viewport.width * 0.16;
-    const spreadY = isMobile ? 0.62 : viewport.height * 0.18;
+    const spreadX = isMobile ? 0.78 : viewport.width * 0.15;
+    const spreadY = isMobile ? 0.5 : viewport.height * 0.15;
     const startPosition = new THREE.Vector3(start.x * spreadX, start.y * spreadY, start.z);
     startPosition.y -= (1 - intro) * (isMobile ? 3.2 : 3.9);
 
     const scanTarget = getScannerTarget(index, viewport, isMobile);
-    const focusTarget = new THREE.Vector3(0, isMobile ? -0.04 : -0.05, 1.18);
+    const focusTarget = new THREE.Vector3(
+      isMobile ? 0 : viewport.width * (index % 2 === 0 ? 0.06 : -0.06),
+      isMobile ? -0.2 : -0.08,
+      1.18
+    );
     const activeDropTarget = scanTarget.clone();
     activeDropTarget.y += isMobile ? 0.8 : viewport.height * 0.38;
     activeDropTarget.z = 1.12;
     const pushedUpTarget = new THREE.Vector3(
       startPosition.x * 0.92,
-      startPosition.y + (isMobile ? 2.45 : viewport.height * 0.9),
+      startPosition.y + (isMobile ? 2.0 : viewport.height * 0.76),
       startPosition.z - 0.55
     );
     const exitTarget = scanTarget.clone();
@@ -106,7 +111,7 @@ export function ProductModel({ url, index, sceneStateRef }) {
     exitTarget.y += isMobile ? -0.8 : -viewport.height * 0.34;
     exitTarget.z = 0.24;
     const basketTarget = new THREE.Vector3(
-      (index - 1.5) * (isMobile ? 0.18 : 0.34),
+      (index - 1.5) * (isMobile ? 0.14 : 0.3),
       isMobile ? -0.78 : -0.68,
       0.64 + index * 0.04
     );
@@ -122,8 +127,8 @@ export function ProductModel({ url, index, sceneStateRef }) {
       ? startPosition.clone().lerp(pushedUpTarget, liftOthers)
       : activePosition;
 
-    const floatY = Math.sin(t * 0.9 + index * 0.7) * 0.08 * (1 - activeTravel) * (pushedByActiveScan || hasScanned ? 0.16 : 1);
-    group.current.position.set(position.x, position.y + floatY, position.z);
+    targetPosition.copy(position);
+    group.current.position.lerp(targetPosition, 1 - Math.exp(-delta * 5.6));
 
     const redScan = smooth(0.62, 0.78, scanProgress) * (1 - exitScan);
     const parkPose = finalProgress;
@@ -138,25 +143,31 @@ export function ProductModel({ url, index, sceneStateRef }) {
     const scrollSpin = scanProgress * 0.9 + scanSpin * Math.PI * 2.35;
     const settledX = THREE.MathUtils.lerp(travelRotationX, scanPoseX, settleInCard);
     const settledZ = THREE.MathUtils.lerp(travelRotationZ, scanPoseZ, settleInCard);
-    group.current.rotation.x =
-      THREE.MathUtils.lerp(settledX, -0.16 + index * 0.06, parkPose) + finalProgress * 0.55;
-    group.current.rotation.z =
-      THREE.MathUtils.lerp(settledZ, (index - 1.5) * 0.12, parkPose) +
-      finalProgress * (index - 1.5) * 0.28;
-    group.current.rotation.y =
+    targetRotation.x =
+      THREE.MathUtils.lerp(settledX, -0.16 + index * 0.06, parkPose) + finalProgress * 0.38;
+    targetRotation.z =
+      THREE.MathUtils.lerp(settledZ, (index - 1.5) * 0.1, parkPose) +
+      finalProgress * (index - 1.5) * 0.22;
+    targetRotation.y =
       restingY +
-      t * 0.36 +
-      scrollSpin +
-      exitScan * Math.PI * 0.45 +
-      parkPose * (index - 1.5) * 0.18;
+      scrollSpin * 0.64 +
+      exitScan * Math.PI * 0.32 +
+      parkPose * (index - 1.5) * 0.16;
+    group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, targetRotation.x, 5.4, delta);
+    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, targetRotation.y, 5.4, delta);
+    group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, targetRotation.z, 5.4, delta);
 
     const scaleBeforeExit = THREE.MathUtils.lerp(startScale, scanScale, scannerAppear);
     const scaleAfterExit = THREE.MathUtils.lerp(scaleBeforeExit, exitScale, exitScan);
     const pushedScale = THREE.MathUtils.lerp(startScale, 0.001, fadeOthers);
     const activeScanScale = hasScanned && finalProgress < 0.02 ? 0.001 : scaleAfterExit;
-    group.current.scale.setScalar(
-      THREE.MathUtils.lerp(pushedByActiveScan ? pushedScale : activeScanScale, basketScale, finalProgress)
+    targetScale.current = THREE.MathUtils.lerp(
+      pushedByActiveScan ? pushedScale : activeScanScale,
+      basketScale,
+      finalProgress
     );
+    const scale = THREE.MathUtils.damp(group.current.scale.x, targetScale.current, 6.2, delta);
+    group.current.scale.setScalar(scale);
 
     materials.forEach((material) => {
       material.color?.lerpColors?.(baseColor, scanColor, redScan);
@@ -165,10 +176,8 @@ export function ProductModel({ url, index, sceneStateRef }) {
   });
 
   return (
-    <Float speed={1.35 + index * 0.14} floatIntensity={0.38} rotationIntensity={0.2}>
-      <group ref={group}>
-        <FittedModel object={clone} fit={fit} />
-      </group>
-    </Float>
+    <group ref={group}>
+      <FittedModel object={clone} fit={fit} />
+    </group>
   );
 }

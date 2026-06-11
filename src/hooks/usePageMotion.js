@@ -59,25 +59,25 @@ export function usePageMotion() {
         return;
       }
 
-      gsap.set("section", { "--section-veil": 0.44 });
-      gsap.set(".motion-word-inner", { yPercent: 112, rotate: 3, opacity: 0 });
+      gsap.set("section", { "--section-veil": 0.34 });
+      gsap.set(".motion-word-inner", { yPercent: 108, rotate: 1.5, opacity: 0 });
       gsap.set(".hero .eyebrow, .hero-center > p:last-child, .hero-copy p", {
         y: 24,
         opacity: 0,
       });
-      gsap.set(".hero-media", { clipPath: "inset(8% round 16px)", opacity: 0 });
+      gsap.set(".hero-media", { clipPath: "inset(10% round 16px)", opacity: 0 });
 
       const loadTl = gsap.timeline({ defaults: { ease: "expo.out" } });
       loadTl
         .fromTo(".loader-receipt", { yPercent: -115 }, { yPercent: 0, duration: 1.1, delay: 0.25 })
         .to(".loader-receipt", { y: 18, opacity: 0, duration: 0.55, ease: "power2.in" }, "+=0.78")
         .to(".loader", { yPercent: -100, duration: 0.9, ease: "power3.inOut" }, "-=0.18")
-        .to(".hero", { "--section-veil": 0, duration: 1.2 }, "-=0.65")
-        .to(".hero-media", { clipPath: "inset(0% round 16px)", opacity: 1, duration: 1.15 }, "-=0.72")
+        .to(".hero", { "--section-veil": 0.03, duration: 1.2 }, "-=0.65")
+        .to(".hero-media", { clipPath: "inset(0% round 16px)", opacity: 0.92, duration: 1.2 }, "-=0.72")
         .fromTo(
           ".hero-media img",
-          { scale: 1.16, yPercent: -8 },
-          { scale: 1.02, yPercent: 0, duration: 1.45 },
+          { scale: 1.12, yPercent: -6 },
+          { scale: 1.015, yPercent: 0, duration: 1.5 },
           "-=1.05"
         )
         .to(".hero .eyebrow", { y: 0, opacity: 1, duration: 0.62 }, "-=0.82")
@@ -94,9 +94,9 @@ export function usePageMotion() {
             ease: "none",
             scrollTrigger: {
               trigger: section,
-              start: "top 78%",
-              end: "top 28%",
-              scrub: 0.8,
+              start: "top 82%",
+              end: "top 22%",
+              scrub: 1.15,
             },
           }
         );
@@ -121,22 +121,22 @@ export function usePageMotion() {
           scrub: 1,
         },
       })
-        .to(".hero-center", { yPercent: -18, opacity: 0.18, ease: "none" }, 0)
-        .to(".hero-media", { yPercent: 10, scale: 0.96, opacity: 0.42, ease: "none" }, 0)
-        .to(".hero-copy", { y: -28, opacity: 0, ease: "none" }, 0);
+        .to(".hero-center", { yPercent: -12, opacity: 0.24, ease: "none" }, 0)
+        .to(".hero-media", { yPercent: 7, scale: 0.985, opacity: 0.5, ease: "none" }, 0)
+        .to(".hero-copy", { y: -18, opacity: 0, ease: "none" }, 0);
 
       gsap.utils.toArray(".reveal-text").forEach((el) => {
         if (el.closest(".hero") || el.closest(".product")) return;
         gsap.fromTo(
           el,
-          { y: 80, opacity: 0, clipPath: "inset(0 0 100% 0)" },
+          { y: 52, opacity: 0, clipPath: "inset(0 0 100% 0)" },
           {
             y: 0,
             opacity: 1,
             clipPath: "inset(0 0 0% 0)",
-            duration: 1.15,
+            duration: 1.05,
             ease: "expo.out",
-            scrollTrigger: { trigger: el, start: "top 84%", once: true },
+            scrollTrigger: { trigger: el, start: "top 86%", once: true },
           }
         );
       });
@@ -147,13 +147,13 @@ export function usePageMotion() {
         }
         gsap.fromTo(
           el,
-          { y: 52, opacity: 0 },
+          { y: 34, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.95,
+            duration: 0.86,
             ease: "expo.out",
-            scrollTrigger: { trigger: el, start: "top 82%", once: true },
+            scrollTrigger: { trigger: el, start: "top 84%", once: true },
           }
         );
       });
@@ -161,15 +161,15 @@ export function usePageMotion() {
       gsap.utils.toArray(".intro-image, .final-media").forEach((media) => {
         gsap.fromTo(
           media,
-          { clipPath: "inset(12% round 16px)", opacity: 0.58 },
+          { clipPath: "inset(14% round 16px)", opacity: 0.52 },
           {
             clipPath: "inset(0% round 16px)",
             opacity: 1,
-            duration: 1,
+            duration: 1.1,
             ease: "expo.out",
             scrollTrigger: {
               trigger: media,
-              start: "top 78%",
+              start: "top 82%",
               once: true,
             },
           }
@@ -216,13 +216,13 @@ export function usePageMotion() {
           image,
           { yPercent: -7 },
           {
-            yPercent: 4,
+            yPercent: 2.5,
             ease: "none",
             scrollTrigger: {
               trigger,
               start: "top bottom",
               end: "bottom top",
-              scrub: true,
+              scrub: 1.15,
             },
           }
         );
@@ -237,75 +237,82 @@ export function usePageMotion() {
         const label = section.querySelector(".label");
         const callout = section.querySelector(".product-callout");
         const stagedElements = [category, ...bodies, label, callout].filter(Boolean);
+        const isReverseLayout = section.classList.contains("product-layout-1");
 
-        gsap.set(stagedElements, { y: 34, opacity: 0 });
-        gsap.set(photo, { clipPath: "inset(12% round 16px)", opacity: 0.65 });
+        gsap.set(stagedElements, { y: 30, opacity: 0 });
+        gsap.set(photo, {
+          clipPath: "inset(16% round 16px)",
+          opacity: 0.5,
+          xPercent: isReverseLayout ? -4 : 4,
+          scale: 0.985,
+        });
 
         const productTl = gsap.timeline({
           defaults: { ease: "expo.out" },
           scrollTrigger: {
             trigger: section,
-            start: "top 66%",
-            once: true,
+            start: "top 78%",
+            end: "top 22%",
+            scrub: 0.95,
           },
         });
 
         productTl
-          .to(category, { y: 0, opacity: 1, duration: 0.48 })
-          .to(titleWords, { yPercent: 0, rotate: 0, opacity: 1, duration: 0.78, stagger: 0.045 }, "-=0.16")
-          .to(photo, { clipPath: "inset(0% round 16px)", opacity: 1, duration: 0.95 }, "-=0.68")
-          .to(bodies, { y: 0, opacity: 1, duration: 0.72, stagger: 0.08 }, "-=0.42")
-          .to(callout, { y: 0, opacity: 1, duration: 0.64 }, "-=0.48")
-          .to(label, { y: 0, opacity: 1, duration: 0.74 }, "-=0.48");
+          .to(photo, { clipPath: "inset(0% round 16px)", opacity: 0.88, xPercent: 0, scale: 1, duration: 1.2 }, 0)
+          .to(category, { y: 0, opacity: 1, duration: 0.42 }, 0.12)
+          .to(titleWords, { yPercent: 0, rotate: 0, opacity: 1, duration: 0.82, stagger: 0.035 }, 0.2)
+          .to(bodies, { y: 0, opacity: 1, duration: 0.7, stagger: 0.075 }, 0.48)
+          .to(callout, { y: 0, opacity: 1, duration: 0.58 }, 0.6)
+          .to(label, { y: 0, opacity: 1, duration: 0.64 }, 0.68);
 
         gsap.to(copy, {
-          yPercent: -5,
+          yPercent: -2.5,
           ease: "none",
           scrollTrigger: {
             trigger: section,
             start: "top top",
             end: "bottom top",
-            scrub: 1,
+            scrub: 1.25,
           },
         });
 
         gsap.to(photo, {
-          scale: 0.96,
-          opacity: 0.52,
+          scale: 0.975,
+          opacity: 0.6,
           ease: "none",
           scrollTrigger: {
             trigger: section,
-            start: "center center",
+            start: "55% center",
             end: "bottom top",
-            scrub: 1,
+            scrub: 1.25,
           },
         });
       });
 
       gsap.utils.toArray(".product-callout").forEach((callout) => {
         gsap.to(callout, {
-          rotate: 1.5,
-          yPercent: -8,
+          rotate: 0.8,
+          yPercent: -5,
           ease: "none",
           scrollTrigger: {
             trigger: callout.closest(".product"),
             start: "top 72%",
             end: "bottom 28%",
-            scrub: true,
+            scrub: 1.2,
           },
         });
       });
 
       gsap.utils.toArray(".product-side").forEach((side) => {
         gsap.to(side, {
-          xPercent: -8,
-          opacity: 0.42,
+          xPercent: -4,
+          opacity: 0.5,
           ease: "none",
           scrollTrigger: {
             trigger: side.closest(".product"),
             start: "top bottom",
             end: "bottom top",
-            scrub: true,
+            scrub: 1.2,
           },
         });
       });
@@ -351,8 +358,8 @@ export function usePageMotion() {
           onUpdate: (self) => {
             const printed = smooth(0.76, 0.94, self.progress);
             const frameOffset = getScanFrameOffset(index);
-            const frameTravel = smooth(0.48, 0.62, self.progress);
-            const hudVisibility = smooth(0.44, 0.58, self.progress);
+            const frameTravel = smooth(0.42, 0.66, self.progress);
+            const hudVisibility = smooth(0.36, 0.54, self.progress) * (1 - smooth(0.92, 1, self.progress));
 
             gsap.set(".scan-hud", { autoAlpha: hudVisibility });
             gsap.set(".scan-frame", {
